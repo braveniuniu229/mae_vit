@@ -57,7 +57,7 @@ class MaskedAutoencoderViT(nn.Module):
         self.decoder_norm = norm_layer(decoder_embed_dim)
         self.decoder_pred = nn.Linear(decoder_embed_dim, patch_size**2 * in_chans, bias=True) # decoder to patch
         # --------------------------------------------------------------------------
-
+        #这里是一个bool值
         self.norm_pix_loss = norm_pix_loss
 
         self.initialize_weights()
@@ -132,19 +132,27 @@ class MaskedAutoencoderViT(nn.Module):
         noise = torch.rand(N, L, device=x.device)  # noise in [0, 1]
         
         # sort noise for each sample
-        ids_shuffle = torch.argsort(noise, dim=1)  # ascend: small is keep, large is remove
+        ids_shuffle = torch.argsort(noise, dim=1)
+        # 这里是按照大小把索引进行排序，里面的元素就是索引
+        # ascend: small is keep, large is remove
         ids_restore = torch.argsort(ids_shuffle, dim=1)
-
+        # 这相当于把这索引按从大到小的顺序排了一下，所以再次使用这个索引相当于把它变回去了
         # keep the first subset
+
+        # 这个ids_keep就是排在前面的索引，就是被保留下来的索引
         ids_keep = ids_shuffle[:, :len_keep]
+
+        # 这个gather函数相当于对取出每个具体被保留下来的，index首先被扩充最后一个维度然后在这个最后的维度重复D次（n，l）的值，
+        # 相当于只要是（n，l）这个前缀里的那么把他的（n,l,d）都赋值为（n,l）前缀然后后面d依次往后走，就相当于把这个地方的整个token给拿出来了
         x_masked = torch.gather(x, dim=1, index=ids_keep.unsqueeze(-1).repeat(1, 1, D))
 
-        # generate the binary mask: 0 is keep, 1 is remove
+        # 这个mask是直接生成一个（n，l）全为1的张量，然后把前面保持不变的变成0，后面精彩的来了，
+        # 直接通过刚才哪个转换为正确位置的索引，把这些0放到其本身的位置去，因为现在的是排序后的前面的，想把他们恢复成排序前的位置，所以前面的这个idx主要就是能够有这样搞一个作用
         mask = torch.ones([N, L], device=x.device)
         mask[:, :len_keep] = 0
-        # unshuffle to get the binary mask
+        # 就是刚才说的，所以被mask的值为1，反之为0
         mask = torch.gather(mask, dim=1, index=ids_restore)
-
+        #没被mask的token，掩码，以及变换会原来顺序的索引
         return x_masked, mask, ids_restore
 
     def forward_encoder(self, x, mask_ratio):
@@ -157,7 +165,7 @@ class MaskedAutoencoderViT(nn.Module):
         # masking: length -> length * mask_ratio
         x, mask, ids_restore = self.random_masking(x, mask_ratio)
 
-        # append cls token
+        # 打乱之后才加的clstoken，所以恢复的时候应该先去掉再恢复
         cls_token = self.cls_token + self.pos_embed[:, :1, :]
         cls_tokens = cls_token.expand(x.shape[0], -1, -1)
         x = torch.cat((cls_tokens, x), dim=1)
@@ -166,7 +174,7 @@ class MaskedAutoencoderViT(nn.Module):
         for blk in self.blocks:
             x = blk(x)
         x = self.norm(x)
-
+        # 这里依然返回之前做随机mask函数的返回值
         return x, mask, ids_restore
 
     def forward_decoder(self, x, ids_restore):
