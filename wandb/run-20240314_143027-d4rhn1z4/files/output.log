@@ -1,0 +1,25 @@
+The model has 53,133,440 trainable parameters
+cuda
+  0%|          | 0/50 [00:00<?, ?it/s]
+Traceback (most recent call last): 0/100 [00:00<?, ?it/s]
+  File "/mnt/d/codespace/mae/train.py", line 137, in <module>
+    train(epoch)
+  File "/mnt/d/codespace/mae/train.py", line 80, in train
+    outputs = model(data)
+  File "/home/braveniuniu/anaconda3/envs/cu117py39/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/mnt/d/codespace/mae/mlp.py", line 70, in forward
+    y1 = self.sub_net1(x)
+  File "/home/braveniuniu/anaconda3/envs/cu117py39/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/mnt/d/codespace/mae/mlp.py", line 100, in forward
+    x = self.layers(x)
+  File "/home/braveniuniu/anaconda3/envs/cu117py39/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/braveniuniu/anaconda3/envs/cu117py39/lib/python3.9/site-packages/torch/nn/modules/container.py", line 217, in forward
+    input = module(input)
+  File "/home/braveniuniu/anaconda3/envs/cu117py39/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/braveniuniu/anaconda3/envs/cu117py39/lib/python3.9/site-packages/torch/nn/modules/linear.py", line 114, in forward
+    return F.linear(input, self.weight, self.bias)
+RuntimeError: mat1 and mat2 must have the same dtype

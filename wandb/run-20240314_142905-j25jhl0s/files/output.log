@@ -1,0 +1,9 @@
+The model has 53,133,440 trainable parameters
+cuda
+  0%|          | 0/50 [00:00<?, ?it/s]
+Traceback (most recent call last): 0/100 [00:00<?, ?it/s]
+  File "/mnt/d/codespace/mae/train.py", line 137, in <module>
+    train(epoch)
+  File "/mnt/d/codespace/mae/train.py", line 76, in train
+    for iteration, (data,labels) in enumerate():
+TypeError: enumerate() missing required argument 'iterable' (pos 1)

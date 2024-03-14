@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/mnt/d/codespace/mae/train.py", line 134, in <module>
+    print(f'The model has {count_parameters(mymodel):,} trainable parameters')
+NameError: name 'mymodel' is not defined
